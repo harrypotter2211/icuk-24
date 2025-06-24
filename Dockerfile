@@ -1,11 +1,13 @@
-# Use JDK-only image for runtime (smaller size)
-FROM eclipse-temurin:17-jdk
-
-# Create working directory
+# Build stage
+FROM maven:3.8.6-openjdk-17 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copy built JAR from the build stage
+# Runtime stage
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
 
-# Command to run the application
-ENTRYPOINT ["java", "-jar", "app.jar"
