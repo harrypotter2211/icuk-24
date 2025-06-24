@@ -1,4 +1,11 @@
-FROM openjdk:8-jdk-alpine
-VOLUME /tmp
-ADD target/oms-order-service-0.0.1-SNAPSHOT.jar oms-order.jar
-ENTRYPOINT ["java", "-jar", "/oms-order.jar"]
+# Use JDK-only image for runtime (smaller size)
+FROM eclipse-temurin:17-jdk
+
+# Create working directory
+WORKDIR /app
+
+# Copy built JAR from the build stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "app.jar"
